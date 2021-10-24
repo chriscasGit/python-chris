@@ -1,0 +1,32 @@
+Option Compare Database
+'Description: Create multiple xlsx files based on query. example below: One file per customer
+
+Public Sub exportVAC1()
+
+Dim Db As DAO.Database, qdef As DAO.QueryDef, rst As DAO.Recordset
+Set Db = CurrentDb
+'Action needed: Change the name of query as needed
+Set rst = Db.OpenRecordset("SELECT DISTINCT [STORE_PARTNER] FROM [VAC_report_01_FR]")
+
+Do While Not rst.EOF
+    'Action needed: You must have a query in your database called MyTempQuery. It may be WHATEVER query, but just has to be there so the macro finds it and overwrites it
+    Set qdef = Db.QueryDefs("[MyTempQuery]")
+    
+    'Action needed: Change the name fo the query as needed (eg. VAC_report_01_FR),
+    'and the name of the field to be used to create separate files eg. STORE_PARTNER
+    qdef.SQL = "SELECT * FROM [VAC_report_01_FR] WHERE STORE_PARTNER = '" & rst!STORE_PARTNER & "'"
+
+    Set qdef = Nothing
+    'Action needed: change the directory where you want to save the files eg. "C:\Users..."
+    'and the name of the files itself. Below it creates a file name based on STORE_PARTNER
+    DoCmd.TransferSpreadsheet acExport, acSpreadsheetTypeExcel12Xml, "MyTempQuery", _
+                  "C:\Users\CAS233\Desktop\SS22 - VAC - FR - " & rst!STORE_PARTNER & ".xlsx", True
+    rst.MoveNext
+Loop
+
+rst.Close
+Set rst = Nothing: Set Db = Nothing
+
+
+End Sub
+
