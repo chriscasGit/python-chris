@@ -1,0 +1,305 @@
+Sub unhideAllRows()
+'Unhides all rows
+'Last modified by: Christian Castaneda 2013 07 02
+
+On Error GoTo errorHandler:
+
+
+Dim currentSheet As Integer
+Dim numberOfSheets As Integer
+Dim confirm As Integer
+
+
+'Ask confirmation from user if he/she wants to proceed
+confirm = MsgBox("You are about to unhide all rows. Are you sure you want to proceed?", vbOKCancel)
+If confirm = 2 Then
+    MsgBox "You've cancelled the operation"
+    Exit Sub
+End If
+
+numberOfSheets = ThisWorkbook.Worksheets.Count
+
+
+For currentSheet = 4 To numberOfSheets
+
+    Worksheets(currentSheet).Select
+
+    Cells.Select
+    Selection.EntireRow.Hidden = False
+
+Next currentSheet
+
+
+Worksheets(4).Select
+
+Exit Sub
+errorHandler:
+
+MsgBox "Operation cancelled"
+
+
+End Sub
+
+
+
+Sub hidesRows()
+'Hides specified rows
+'Last modified by: Christian Castaneda 2013 07 02
+
+On Error GoTo errorHandler
+
+Dim currentSheet As Integer
+Dim numberOfSheets As Integer
+Dim startRow As Integer
+Dim endRow As Integer
+Dim confirm As Variant
+
+
+'prompts user for inputing rows
+startRow = InputBox(Prompt:="Insert the STARTING ROW that you want to hide on all sheets", _
+          Title:="Row Selection", Default:="1")
+endRow = InputBox(Prompt:="Insert the LAST ROW that you want to hide on all sheets", _
+          Title:="Row Selection", Default:=startRow + 1)
+
+
+'Ask confirmation from user if he/she wants to proceed
+confirm = MsgBox("You are about to hide all rows between: " & startRow & " and " & endRow & "  Are you sure you want to proceed?", vbOKCancel)
+If confirm = 2 Then
+    MsgBox "You've cancelled the operation"
+    Exit Sub
+End If
+
+
+
+
+'counts number of sheets
+numberOfSheets = ThisWorkbook.Worksheets.Count
+
+
+'starts process
+For currentSheet = 5 To numberOfSheets
+
+    Worksheets(currentSheet).Select
+
+    Rows(startRow & ":" & endRow).Select
+    Selection.EntireRow.Hidden = True
+
+Next currentSheet
+
+
+Worksheets(4).Select
+
+Exit Sub
+
+errorHandler:
+MsgBox "Something didn't work as expected."
+
+
+
+End Sub
+
+
+Sub freezeRowValue()
+'Freezes value of specified rows
+'Last modified by: Christian Castaneda 2013 07 02
+
+On Error GoTo errorHandler
+
+Dim currentSheetIndex As Integer
+Dim numberOfSheets As Integer
+Dim rowToFreeze As Integer
+Dim confirm As Variant
+
+'Counts number of sheets in workbook
+numberOfSheets = ThisWorkbook.Worksheets.Count
+
+'Prompts user for row to freeze
+rowToFreeze = InputBox(Prompt:="Insert the row number that you want to FREEZE values", _
+          Title:="Row Selection", Default:="1")
+
+'Ask confirmation from user if he/she wants to proceed
+confirm = MsgBox("You are about to freeze value of row: " & rowToFreeze & ".  Are you sure you want to proceed?", vbOKCancel)
+If confirm = 2 Then
+    MsgBox "You've cancelled the operation"
+    Exit Sub
+End If
+
+
+
+'If no rows are selected, you exit the program
+If rowToFreeze = Null Then
+    MsgBox "No Rows selected"
+    Exit Sub
+End If
+
+
+' Process starts
+    'note: I select sheet index 7 (Total MO) because thats
+    'the first sheet I want to freeze
+For currentSheet = 7 To numberOfSheets
+
+    Worksheets(currentSheet).Select
+
+    Range("B" & rowToFreeze & ":M" & rowToFreeze).Select
+    Selection.Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone
+
+
+Next currentSheet
+
+Worksheets(4).Select
+
+Exit Sub
+errorHandler:
+
+MsgBox "Something didn't work as expected"
+
+
+End Sub
+
+
+
+Sub restoreFormula()
+'Restores formulas on already frozen rows
+'Last modified by: Christian Castaneda 2013 07 02
+
+On Error GoTo errorHandler
+
+
+Dim currentSheetIndex As Integer
+Dim numberOfSheets As Integer
+Dim rowToRestore
+Dim rowWithFormula
+
+'Counts number of sheets in workbook
+numberOfSheets = ThisWorkbook.Worksheets.Count
+
+'Prompts user for row to freeze
+rowToRestore = InputBox(Prompt:="Insert the row number that you want to Fix/RESTORE", _
+          Title:="Row Selection", Default:="1")
+
+rowWithFormula = InputBox(Prompt:="Insert the row number that contains the FORMULA that you want to use for restoring", _
+          Title:="Row Selection", Default:="1")
+
+
+
+'Ask confirmation from user if he/she wants to proceed
+confirm = MsgBox("You are about to restore value of row " & rowToRestore & " with formula on row " & rowWithFormula & ". Are you sure you want to proceed?", vbOKCancel)
+If confirm = 2 Then
+    MsgBox "You've cancelled the operation"
+    Exit Sub
+End If
+
+
+
+'If no rows are selected, you exit the program
+If rowToRestore = 0 Then
+    MsgBox "No Rows selected"
+    Exit Sub
+End If
+If rowWithFormula = 0 Then
+    MsgBox "No Rows selected"
+    Exit Sub
+End If
+
+
+' Process starts
+'note: I select sheet index 7 (Total MO) because thats
+'the first sheet I want to freeze
+For currentSheet = 7 To numberOfSheets
+
+
+Worksheets(currentSheet).Select
+
+    'Copy Formula
+    Range("B" & rowWithFormula & ":M" & rowWithFormula).Select
+    Selection.Copy
+    
+    'Paste into row you want to restore
+    Range("B" & rowToRestore).Select
+    Selection.PasteSpecial Paste:=xlPasteFormulas, Operation:=xlNone
+
+
+Next currentSheet
+
+Worksheets(4).Select
+
+Exit Sub
+errorHandler:
+
+MsgBox "Something didn't work as expected"
+
+End Sub
+
+
+
+Sub UnhideAllSheets()
+'Restores formulas on already frozen rows
+'Last modified by: Christian Castaneda 2013 07 02 (ps: just got it from the internet :-) lol)
+
+
+Dim ws As Worksheet
+For Each ws In ActiveWorkbook.Worksheets
+ws.Visible = xlSheetVisible
+Next ws
+End Sub
+
+
+
+
+Sub preparePrinting()
+'Hides sheets that shouldn't be printed or exported to PDF
+'Last modified by: Christian Castaneda 2013 07 02 (ps: just got it from the internet :-) lol)
+
+
+On Error GoTo errorHandler
+
+    'Hides all sheets we don't need for printing
+    Sheets("Sales Fcst").Select
+    ActiveWindow.SelectedSheets.Visible = False
+    
+    Sheets("Units Fcst").Select
+    ActiveWindow.SelectedSheets.Visible = False
+    
+    Sheets("Margin Fcst").Select
+    ActiveWindow.SelectedSheets.Visible = False
+    
+    Sheets("START").Select
+    ActiveWindow.SelectedSheets.Visible = False
+    
+    Sheets("END").Select
+    ActiveWindow.SelectedSheets.Visible = False
+    
+    'Select WELCOME sheet
+    Worksheets(4).Select
+    
+    Exit Sub
+  
+errorHandler:
+MsgBox "Something didn't work as expected"
+  
+End Sub
+
+
+
+
+Sub exportPDF()
+'Exports file to PDF and saves it on your desktop
+'Last modified by: Christian Castaneda 2013 07 02
+On Error GoTo errorHandler
+
+
+    ActiveWorkbook.ExportAsFixedFormat Type:=xlTypePDF, Filename:= _
+        "STAGGER KP.pdf", Quality:= _
+        xlQualityStandard, IncludeDocProperties:=True, IgnorePrintAreas:=False, _
+        From:=2, To:=44, OpenAfterPublish:=True
+    
+Exit Sub
+
+errorHandler:
+MsgBox "Something didn't work as expected"
+
+End Sub
+
+
+
