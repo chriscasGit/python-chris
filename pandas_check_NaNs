@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 
 # Check individual values for missing values
-print(avocados_2016.isna)
+print(avocados_2016.isna())
 
 # Check each column for missing values
 print(avocados_2016.isna().any())
